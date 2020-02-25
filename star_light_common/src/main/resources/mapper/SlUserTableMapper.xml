@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.king2.sl.common.pojo.SlUserTableMapper">
+  <resultMap id="BaseResultMap" type="org.king2.sl.common.pojo.SlUserTable">
+    <id column="sl_user_id" jdbcType="INTEGER" property="slUserId" />
+    <result column="sl_user_name" jdbcType="VARCHAR" property="slUserName" />
+    <result column="sl_user_pass" jdbcType="VARCHAR" property="slUserPass" />
+    <result column="sl_user_image" jdbcType="VARCHAR" property="slUserImage" />
+    <result column="sl_user_email" jdbcType="VARCHAR" property="slUserEmail" />
+    <result column="sl_user_state" jdbcType="INTEGER" property="slUserState" />
+    <result column="sl_create_time" jdbcType="TIMESTAMP" property="slCreateTime" />
+    <result column="sl_update_time" jdbcType="TIMESTAMP" property="slUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    sl_user_id, sl_user_name, sl_user_pass, sl_user_image, sl_user_email, sl_user_state, 
+    sl_create_time, sl_update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sl_user_table
+    where sl_user_id = #{slUserId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from sl_user_table
+    where sl_user_id = #{slUserId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="org.king2.sl.common.pojo.SlUserTable">
+    insert into sl_user_table (sl_user_id, sl_user_name, sl_user_pass, 
+      sl_user_image, sl_user_email, sl_user_state, 
+      sl_create_time, sl_update_time)
+    values (#{slUserId,jdbcType=INTEGER}, #{slUserName,jdbcType=VARCHAR}, #{slUserPass,jdbcType=VARCHAR}, 
+      #{slUserImage,jdbcType=VARCHAR}, #{slUserEmail,jdbcType=VARCHAR}, #{slUserState,jdbcType=INTEGER}, 
+      #{slCreateTime,jdbcType=TIMESTAMP}, #{slUpdateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="org.king2.sl.common.pojo.SlUserTable">
+    insert into sl_user_table
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="slUserId != null">
+        sl_user_id,
+      </if>
+      <if test="slUserName != null">
+        sl_user_name,
+      </if>
+      <if test="slUserPass != null">
+        sl_user_pass,
+      </if>
+      <if test="slUserImage != null">
+        sl_user_image,
+      </if>
+      <if test="slUserEmail != null">
+        sl_user_email,
+      </if>
+      <if test="slUserState != null">
+        sl_user_state,
+      </if>
+      <if test="slCreateTime != null">
+        sl_create_time,
+      </if>
+      <if test="slUpdateTime != null">
+        sl_update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="slUserId != null">
+        #{slUserId,jdbcType=INTEGER},
+      </if>
+      <if test="slUserName != null">
+        #{slUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="slUserPass != null">
+        #{slUserPass,jdbcType=VARCHAR},
+      </if>
+      <if test="slUserImage != null">
+        #{slUserImage,jdbcType=VARCHAR},
+      </if>
+      <if test="slUserEmail != null">
+        #{slUserEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="slUserState != null">
+        #{slUserState,jdbcType=INTEGER},
+      </if>
+      <if test="slCreateTime != null">
+        #{slCreateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="slUpdateTime != null">
+        #{slUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.king2.sl.common.pojo.SlUserTable">
+    update sl_user_table
+    <set>
+      <if test="slUserName != null">
+        sl_user_name = #{slUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="slUserPass != null">
+        sl_user_pass = #{slUserPass,jdbcType=VARCHAR},
+      </if>
+      <if test="slUserImage != null">
+        sl_user_image = #{slUserImage,jdbcType=VARCHAR},
+      </if>
+      <if test="slUserEmail != null">
+        sl_user_email = #{slUserEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="slUserState != null">
+        sl_user_state = #{slUserState,jdbcType=INTEGER},
+      </if>
+      <if test="slCreateTime != null">
+        sl_create_time = #{slCreateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="slUpdateTime != null">
+        sl_update_time = #{slUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where sl_user_id = #{slUserId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.king2.sl.common.pojo.SlUserTable">
+    update sl_user_table
+    set sl_user_name = #{slUserName,jdbcType=VARCHAR},
+      sl_user_pass = #{slUserPass,jdbcType=VARCHAR},
+      sl_user_image = #{slUserImage,jdbcType=VARCHAR},
+      sl_user_email = #{slUserEmail,jdbcType=VARCHAR},
+      sl_user_state = #{slUserState,jdbcType=INTEGER},
+      sl_create_time = #{slCreateTime,jdbcType=TIMESTAMP},
+      sl_update_time = #{slUpdateTime,jdbcType=TIMESTAMP}
+    where sl_user_id = #{slUserId,jdbcType=INTEGER}
+  </update>
+</mapper>

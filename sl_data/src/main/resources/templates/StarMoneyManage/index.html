@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport"/>
+    <title>我的星币</title>
+    <link rel="stylesheet" th:href="@{/output.css}">
+    <link rel="icon" type="image/png" th:href="@{/favicon.png}">
+    <link rel="stylesheet" th:href="@{/output.css}">
+    <link rel="icon" type="image/png" th:href="@{/favicon.png}">
+</head>
+<body class="bg-grey-lighter font-sans antialiased">
+<div class="fixed bg-grey-lighter pin z-50 flex justify-center items-center" id="loading">
+    <svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         id="morphing">
+        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+            <g transform="translate(-1178.000000, -87.000000)">
+                <g transform="translate(1159.000000, 0.000000)">
+                    <g transform="translate(0.000000, 87.000000)">
+                        <g transform="translate(19.000000, 0.000000)">
+                            <circle id="small-circle" fill="#5661B3" cx="30" cy="30" r="30"></circle>
+                            <path id="moon"
+                                  d="M30.5,49.7304688 C40.7172679,49.7304688 30.5,43.266096 30.5,33.0488281 C30.5,22.8315603 40.7172679,12 30.5,12 C20.2827321,12 11.0390625,20.6479665 11.0390625,30.8652344 C11.0390625,41.0825022 20.2827321,49.7304688 30.5,49.7304688 Z"
+                                  fill="#F4E1E0"></path>
+                            <circle id="big-circle" fill="#070707" cx="31" cy="31" r="11"></circle>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </svg>
+</div>
+<div th:replace="common/top"></div>
+<!-- Main -->
+<div class="flex">
+    <div th:replace="common/left"></div>
+    <!-- Content -->
+    <div class="flex flex-1 flex-col md:px-6 pt-10" id="content">
+
+        <!-- Title -->
+        <div class="px-6 md:px-0 flex justify-between items-center -order-1">
+            <div>
+                <h2 class="font-normal">我的星币</h2>
+            </div>
+            <button class="bg-indigo-dark hover:bg-indigo-darker text-white text-sm py-2 px-4 rounded-full transition-normal hover:shadow hover:translate-y-1 active:translate-y-1 focus:outline-none"
+                    onclick="openAddMoney()">充值星币
+            </button>
+        </div>
+
+        <!-- Desktop Stats -->
+        <div class="hidden px-6 md:px-0 mt-4 md:flex flex-wrap order-1 md:-order-1 md:shadow-md js-tab-pane"
+             id="section-stats">
+            <div style="margin-bottom: 10px;"
+                 class="w-full md:w-1/2 p-4 md:pt-12 md:pl-1 mt-4 md:mt-0 lg:pt-12 lg:pl-8 rounded md:rounded-r-none bg-white shadow-md md:shadow-none">
+                <div class="flex">
+                    <div class="w-1/2">
+                        <p class="text-indigo text-sm p-2">总消费账单</p>
+                        <p class="font-medium text-sm pl-2"><a href="#">点我查看</a></p>
+                    </div>
+                    <div class="w-1/2">
+                        <p class="text-indigo text-sm p-2">余额</p>
+                        <p class="font-medium text-sm pl-2">[[${totalMoney}]]星币</p>
+                    </div>
+                </div>
+                <div class="pt-6">
+                    <p class="text-indigo text-sm p-2">开通会员</p>
+                    <p class="font-medium text-sm pl-2 leading-normal">开通会员即可享受9.3折优惠，
+                        <a href="#">立即开通</a></p>
+                </div>
+            </div>
+            <div style="margin-bottom: 10px;"
+                 class="p-4 px-6 w-full md:w-1/2 rounded md:rounded-r-none bg-white shadow-md md:shadow-none">
+                <h4>您最近九次的充值记录</h4>
+                <table class="mt-4 w-full">
+                    <thead class="p-2 text-sm leading-loose border-b text-indigo">
+                    <tr>
+                        <td>充值金额</td>
+                        <td class="text-center">充值时间</td>
+                        <td class="text-right">详情</td>
+                    </tr>
+                    </thead>
+                    <tbody class="p-2 leading-loose text-sm">
+                    <tr class="border-b" th:if="${#lists.isEmpty(nineData)}">
+                        <td class="py-2">暂无充值详情</td>
+                        <td class="py-2 text-center">暂无充值详情</td>
+                        <td class="py-2 text-right">暂无充值详情</td>
+                    </tr>
+                    <tr class="border-b" th:each="nine,nineStat:${nineData}" th:if="not ${#lists.isEmpty(nineData)}">
+                        <td class="py-2">[[${nine.slMoneyName}]]星币</td>
+                        <td class="py-2 text-center"
+                            th:text="${#dates.format(nine.slRechargeCreateTime , 'yyyy-MM-dd HH:mm:ss')}">2019-09-28
+                            15:34
+                        </td>
+                        <td class="py-2 text-right"><a href="#"
+                                                       th:onclick="'JavaScript:orderInfo(\''+${nineStat.index}+'\',\''+${nine.slMoneyId}+'\')'">详情</a>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="px-6 md:px-0 flex items-baseline justify-between border-b-2 border-grey-light mt-6 order-0 lg:order-1">
+            <div>
+                <div class="inline-block md:hidden no-underline border-indigo pb-2 px-2 text-sm mr-2 text-indigo-darkest hover:cursor-pointer js-tab relative"
+                     data-tab="section-stats">点我查看
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Profile -->
+    <div class="hidden absolute pin-b z-10 lg:relative lg:block w-full lg:w-1/5 bg-grey-lighter-2 px-6 pt-10"
+         id="profile">
+        <div class="flex items-center mb-6">
+            <svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 id="avatar">
+                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g transform="translate(-1178.000000, -87.000000)">
+                        <g transform="translate(1159.000000, 0.000000)">
+                            <g transform="translate(0.000000, 87.000000)">
+                                <g transform="translate(19.000000, 0.000000)">
+                                    <circle id="small-circle" fill="#5661B3" cx="30" cy="30" r="30"></circle>
+                                    <path id="moon"
+                                          d="M30.5,49.7304688 C40.7172679,49.7304688 30.5,43.266096 30.5,33.0488281 C30.5,22.8315603 40.7172679,12 30.5,12 C20.2827321,12 11.0390625,20.6479665 11.0390625,30.8652344 C11.0390625,41.0825022 20.2827321,49.7304688 30.5,49.7304688 Z"
+                                          fill="#F4E1E0"></path>
+                                    <circle id="big-circle" fill="#070707" cx="31" cy="31" r="11"></circle>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+            <div class="ml-3">
+                <p>Amie Chen</p>
+                <p class="text-grey-dark mt-1 text-sm">Joined since 2017</p>
+            </div>
+        </div>
+        <!-- <div class="mt-6">
+            <p class="text-grey-dark mt-1 text-sm">Currently Reading</p>
+            <div class="flex items-start mt-2">
+                <img src="./images/read-04.jpg" alt="read" class="w-1/6 lg:w-1/5 max-w-tiny shadow-md block transition-normal hover:brighter">
+                <div class="ml-3">
+                    <p class="mt-1 leading-normal">Popular Lies* About Graphic Design</p>
+                    <p class="text-indigo text-sm mt-1">15/250 pages</p>
+                </div>
+            </div>
+        </div> -->
+    </div>
+</div>
+</body>
+<script th:src="@{/bundle.js}" async defer></script>
+<script th:src="@{/layui/layui.js}"></script>
+<script th:src="@{/jquery-1.9.1.min.js}"></script>
+<script th:inline="JavaScript">
+
+    var arrays = [[${nineData}]];
+
+    layui.use('layer', function () {
+        var layer = layui.layer;
+
+    });
+
+    function getInfo(index) {
+        return arrays[index];
+    }
+
+    function orderInfo(index, orderId) {
+        var width = '460px';
+        var height = "600px";
+        if (document.body.clientWidth < 500) {
+            width = '96%';
+            height = '95%'
+        }
+        layer.open({
+            type: 2,
+            title: '订单详情',
+            shadeClose: true,
+            shade: 0.8,
+            area: [width, height],
+            scrollbar: false,
+            content: 'money/get?index=' + index + "&orderId=" + orderId //iframe的url
+        });
+    }
+
+    function openAddMoney() {
+        var width = '460px';
+        var height = "600px";
+        if (document.body.clientWidth < 500) {
+            width = '96%';
+            height = '95%'
+        }
+        layer.open({
+            type: 2,
+            title: '充值星币',
+            shadeClose: true,
+            shade: 0.8,
+            area: [width, height],
+            scrollbar: false,
+            content: 'show/add/money' //iframe的url
+        });
+    }
+</script>
+</html>

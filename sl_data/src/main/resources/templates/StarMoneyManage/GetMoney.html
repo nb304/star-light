@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <style>
+        .order_title {
+            height: 50px;
+            line-height: 50px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .one_content {
+            font-size: 13px;
+            height: 50px;
+            line-height: 50px;
+            margin: 0px 20px;
+
+        }
+
+        .one_content div {
+            float: left;
+        }
+
+        .left_content {
+            width: 40%;
+            color: #AFAFAF;
+        }
+
+        .left_content1 {
+            width: 20%;
+            color: #AFAFAF;
+        }
+
+        .right_content {
+            width: 60%;
+            text-align: right;
+        }
+
+        .right_content1 {
+            width: 80%;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<div class="order_title">订单详情</div>
+<div th:if="not ${result.status == 200}">
+    [[${result.msg}]]
+</div>
+<div th:if="${result.status == 200}">
+    <div class="one_content">
+        <div class="left_content1">订单编号</div>
+        <div class="right_content1" id="order"></div>
+    </div>
+    <div class="one_content">
+        <div class="left_content">创建时间</div>
+        <div class="right_content" id="time"></div>
+    </div>
+    <div class="one_content">
+        <div class="left_content">人名币</div>
+        <div class="right_content">[[${result.data.slRmb}]]RMB</div>
+    </div>
+    <div class="one_content">
+        <div class="left_content">充值星币</div>
+        <div class="right_content">[[${result.data.slMoneyName}]]星币</div>
+    </div>
+    <div class="one_content">
+        <div class="left_content">赠送星币</div>
+        <div class="right_content">[[${result.data.slGiveMoney}]]星币</div>
+    </div>
+    <div class="one_content">
+        <div class="left_content">未到账？</div>
+        <div class="right_content">
+            <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=2246483156&site=qq&menu=yes">请联系QQ:2246483156</a>
+        </div>
+    </div>
+</div>
+
+<div style="text-align: right;margin: 10px;">
+    <button class="layui-btn layui-btn-normal" onclick="closewin()">关闭窗口</button>
+</div>
+</body>
+<script th:src="@{/layui/layui.js}"></script>
+<script th:src="@{/jquery-1.9.1.min.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+<script th:inline="JavaScript">
+    var index = [[${index}]];
+    $(function () {
+        var info = window.parent.getInfo(index);
+        $("#order").html(info.slRechargeOrder);
+        $("#time").html(fomartDateTime(info.slRechargeCreateTime));
+    });
+
+    function closewin() {
+        var index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+    }
+</script>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport"/>
+    <title></title>
+
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <style>
+        .layui-form-item {
+            width: 95% !important;
+        }
+
+        .jy {
+            cursor: no-drop !important;
+            background-color: #CCC !important;
+        }
+    </style>
+</head>
+<body>
+
+<form class="layui-form" style="margin-top: 20px;" id="bookForm">
+    <!-- 提示：如果你不想用form，你可以换成div等任何一个普通元素 -->
+    <div class="layui-form-item">
+        <label class="layui-form-label">数据名称</label>
+        <div class="layui-input-block">
+            <input type="text" maxlength="20" id="slBookName" placeholder="请输入书本名称" autocomplete="off"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">数据类型</label>
+        <div class="layui-input-block">
+            <input type="hidden" id="slDataTypeId"/>
+            <select name="interest" lay-filter="slDataType">
+                <option value="">请选择</option>
+                <option th:value="${data.slDataId}" th:each="data:${bookDataType}">[[${data.slDataName}]]</option>
+            </select>
+        </div>
+
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">漫画类型</label>
+        <div class="layui-input-block">
+            <input type="hidden" id="slTypeId"/>
+            <input lay-filter="slType" type="checkbox" th:value="${book.slTypeId}" th:each="book:${bookType}"
+                   th:title="${book.slTypeName}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否免费</label>
+        <input type="hidden" id="slIsFree" value="2"/>
+        <div class="layui-input-block">
+            <input lay-filter="free" type="checkbox" lay-skin="switch">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">观看星币</label>
+        <div class="layui-input-block">
+            <input type="text" id="sl_cost" placeholder="请输入每章的观看费用(前两章必须免费)" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">请填写描述</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入内容" id="slContent" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">上传封面</label>
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" id="test1">
+                <i class="layui-icon">&#xe67c;</i>上传封面
+            </button>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">上传内容</label>
+        <div class="layui-input-block">
+
+            <div class="layui-upload">
+                <button type="button" class="layui-btn layui-btn-normal" id="testList">上传内容</button>
+                <div class="layui-upload-list">
+                    <table class="layui-table">
+                        <thead>
+                        <tr>
+                            <th>文件名</th>
+                            <th>大小</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="demoList"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!--<button type="button" class="layui-btn" id="contentBtn">
+                <i class="layui-icon">&#xe67c;</i>上传内容
+            </button>-->
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" type="button" id="uploadBtn" onclick="uploadFun()">
+                上传文件
+            </button>
+            <button type="button" onclick="closeWin()" class="layui-btn layui-btn-primary">关闭窗口</button>
+        </div>
+    </div>
+    <button id="uploadBook" style="display: none;" type="button" onclick="test()"></button>
+    <button id="uploadData" style="display: none;" type="button" onclick="loadData()"></button>
+    <input type="hidden" id="bookId"/>
+    <!-- 更多表单结构排版请移步文档左侧【页面元素-表单】一项阅览 -->
+</form>
+</body>
+<script th:src="@{/layui/layui.js}"></script>
+<script th:src="@{/jquery-1.9.1.min.js}"></script>
+<script th:src="@{/aes.js}"></script>
+<script>
+
+    var AES_KEY = "XINGGUANGLQQNBKJ";
+    var key = CryptoJS.enc.Utf8.parse(AES_KEY);//将秘钥转换成Utf8字节数组
+
+    var formData = "";
+    var typeId = "";
+
+    function closeWin() {
+        var index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+    }
+
+    function test() {
+        console.log("封面开始上传>>>>>");
+    }
+
+    function loadData() {
+        console.log("内容开始上传>>>>>");
+    }
+
+    function clickLoadData() {
+        $("#uploadData").trigger("click");
+    }
+
+    function uploadFun() {
+        try {
+            // 校验表单是否完成
+            $("#uploadBtn").addClass("jy");
+            $("#uploadBtn").html("智能校验数据中...");
+            $("#uploadBtn").removeAttr("onclick");
+            var sl_cost = $("#sl_cost").val();
+            var isBreak = false;
+            if ($("#slBookName").val() == "" || $("#slBookName").val().length > 50) {
+                layer.msg("数据名称字符0~50");
+                isBreak = true;
+            } else if (($("#slContent").val() != "") && $("#slContent").val().length > 200) {
+                layer.msg("描述最多位200字符");
+                isBreak = true;
+            } else if ($("#slDataTypeId").val() == "") {
+                layer.msg("请选择数据类型");
+                isBreak = true;
+            } else if(sl_cost.trim() == "") {
+                layer.msg("请填写星币");
+                isBreak = true;
+            }
+
+            if (isBreak) {
+                $("#uploadBtn").removeClass("jy");
+                $("#uploadBtn").html("上传文件");
+                $("#uploadBtn").attr("onclick", "uploadFun()");
+                return;
+            }
+
+            // 需要初始化表单内容
+            $("#uploadBtn").addClass("jy");
+            $("#uploadBtn").html("初始化内容中...");
+            $("#uploadBtn").removeAttr("onclick");
+            var bookTypeId = "";
+            for (var i = 0; i < types.length; i++) {
+                if (bookTypeId.trim() == "") {
+                    bookTypeId = types[i];
+                } else {
+                    bookTypeId += "," + types[i];
+                }
+            }
+            typeId = bookTypeId;
+
+            var tableData = {
+                "slBookName": $("#slBookName").val(),
+                "slContent": $("#slContent").val(),
+                "slDataTypeId": $("#slDataTypeId").val(),
+                "slIsFree": $("#slIsFree").val(),
+                "slBookId": "",
+                "userId": "",
+                "slCoverImage": "",
+                "slMaxOrder": "0",
+                "slUpdateTime": null
+            }
+
+            var encrypt = CryptoJS.AES.encrypt(JSON.stringify(tableData), key, {
+                iv: CryptoJS.enc.Utf8.parse(AES_KEY.substr(0, 16)),
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            formData = encrypt.toString();
+
+            $("#uploadBtn").html("正在上传...");
+            $("#uploadBook").trigger("click");
+        } catch (e) {
+            console.log(e)
+            $("#uploadBtn").removeClass("jy");
+            $("#uploadBtn").html("上传文件");
+            $("#uploadBtn").attr("onclick", "uploadFun()");
+        }
+    }
+
+    var uploadInst2 = "";
+    var uploadInst = "";
+    layui.use('upload', function () {
+        var upload = layui.upload;
+
+        //多文件列表示例
+        var demoListView = $('#demoList')
+            , uploadListIns = upload.render({
+            elem: '#testList'
+            , url: '/upload/content' //改成您自己的上传接口
+            , accept: 'file'
+            , multiple: true
+            , auto: false
+            , field: 'file'
+            , bindAction: '#testListAction'
+            , size: 1024 * 1024 * 2
+            , bindAction: '#uploadData'
+            , choose: function (obj) {
+                var files = this.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+                //读取本地文件
+                obj.preview(function (index, file, result) {
+                    var tr = $(['<tr id="upload-' + index + '">'
+                        , '<td>' + file.name + '</td>'
+                        , '<td>' + (file.size / 1024).toFixed(1) + 'kb</td>'
+                        , '<td>等待上传</td>'
+                        , '<td>'
+                        , '<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>'
+                        , '<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'
+                        , '</td>'
+                        , '</tr>'].join(''));
+
+                    //单个重传
+                    tr.find('.demo-reload').on('click', function () {
+                        obj.upload(index, file);
+                    });
+
+                    //删除
+                    tr.find('.demo-delete').on('click', function () {
+                        delete files[index]; //删除对应的文件
+                        tr.remove();
+                        uploadListIns.config.elem.next()[0].value = ''; //清空 input file 值，以免删除后出现同名文件不可选
+                    });
+
+                    demoListView.append(tr);
+                });
+            },
+            before: function (obj) {
+                this.data = {
+                    'bookId': $("#bookId").val(),
+                    'cost': $("#sl_cost").val()
+                }
+            }
+            , done: function (res, index, upload) {
+
+                if (res.status == 200) {
+
+                    layer.msg("内容添加请求成功，请等待服务器的确认。");
+                    $("#uploadBtn").html("已完成,30秒后将自动关闭窗口!");
+                    setTimeout(function () {
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    }, 30000);
+                } else {
+                    layer.msg(res.msg);
+                    $("#uploadBtn").removeClass("jy");
+                    $("#uploadBtn").html("上传文件");
+                    $("#uploadBtn").attr("onclick", "uploadFun()");
+                }
+            }
+            , error: function (index, upload) {
+                var tr = demoListView.find('tr#upload-' + index)
+                    , tds = tr.children();
+                tds.eq(2).html('<span style="color: #FF5722;">上传失败</span>');
+                //请求异常回调
+                $("#uploadBtn").removeClass("jy");
+                $("#uploadBtn").html("上传文件失败，请重新尝试");
+                $("#uploadBtn").attr("onclick", "uploadFun()");
+            }
+        });
+
+        // 内容上传
+        /* uploadInst = upload.render({
+             elem: '#contentBtn' //绑定元素
+             ,
+             auto: false,
+             field: 'file',
+             accept: 'file',
+             size: 1024 * 1024 * 2,
+             bindAction: '#uploadData',
+             multiple: true,
+             url: '/upload/content' //上传接口
+             ,
+             before: function (obj) {
+                 this.data = {
+                     'bookId': $("#bookId").val(),
+                     'sl_cost': $("#sl_cost").val()
+                 }
+             },
+             done: function (res) {
+                 //上传完毕回调
+
+             },
+             error: function () {
+                 $("#uploadBtn").removeClass("jy");
+                 $("#uploadBtn").html("上传文件失败，请重新尝试");
+                 $("#uploadBtn").attr("onclick", "uploadFun()");
+             }
+         });*/
+
+        //封面上传
+        uploadInst2 = upload.render({
+            elem: '#test1' //绑定元素
+            ,
+            data: {
+                'type': 'image/jpeg',
+                'content': '',
+                'sl_cost': ''
+            },
+            auto: false,
+            field: 'file',
+            accept: 'images',
+            size: 1024 * 3,
+            bindAction: '#uploadBook',
+            url: '/upload/' //上传接口
+            ,
+            before: function (obj) {
+                this.data = {
+                    'type': 'image/jpeg',
+                    'content': formData,
+                    'typeId': typeId
+                }
+            },
+            done: function (res) {
+                if (res.status == 200) {
+                    $("#uploadBtn").html("马上就好...");
+                    // 触发另外一个阶段的表单提交
+                    $("#bookId").val(res.data);
+                    clickLoadData();
+                } else {
+                    layer.msg(res.msg);
+                    $("#uploadBtn").removeClass("jy");
+                    $("#uploadBtn").html("上传文件");
+                    $("#uploadBtn").attr("onclick", "uploadFun()");
+                }
+
+            },
+            error: function () {
+                //请求异常回调
+                $("#uploadBtn").removeClass("jy");
+                $("#uploadBtn").html("上传文件失败，请重新尝试");
+                $("#uploadBtn").attr("onclick", "uploadFun()");
+
+            }
+        });
+    });
+    var types = [];
+    layui.use('form', function () {
+        var form = layui.form;
+
+        form.on('select(slDataType)', function (data) {
+
+            $("#slDataTypeId").val(data.value);
+        });
+
+        form.on('checkbox(slType)', function (data) {
+            if (data.elem.checked) {
+                types.push(data.value);
+            } else {
+                for (var i = 0; i < types.length; i++) {
+                    if (data.value == types[i]) {
+                        types.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        });
+
+        form.on('switch(free)', function (data) {
+            if (data.elem.checked) {
+                $("#slIsFree").val("1");
+            } else {
+                $("#slIsFree").val("2");
+            }
+        });
+    });
+</script>
+</html>

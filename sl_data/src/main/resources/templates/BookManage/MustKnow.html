@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>用户须知</title>
+    <style>
+        .title {
+            height: 60px;
+            line-height: 60px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 30px;
+        }
+
+        .msg1 {
+            margin-top: 10px;
+            color: red;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .jy {
+            cursor: no-drop !important;
+            background-color: #CCC !important;
+        }
+
+        .msg2 {
+            margin-top: 5px;
+            text-align: center;
+            font-size: 12px;
+            color: #CCC;
+        }
+    </style>
+
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+</head>
+<body>
+<div class="title">
+    《用户须知》
+</div>
+<div class="msg1">
+    请使用本网站的用户遵守以下规则，谢谢你们。
+</div>
+<div>
+    <div class="msg2">
+        1、请保证年满18周岁再来观摩本站内容。
+    </div>
+    <div class="msg2">
+        2、未经作者同意，请勿转载本站的内容放置其他站内。
+    </div>
+    <div class="msg2">
+        3、作者请上传自己的作品，切勿将他人作品占为己有，如有发现扣除现有的所有资金，并删除账号及作品。
+    </div>
+</div>
+<div style="text-align: right;
+    margin-top: 100px;
+    font-size: 13px;
+    font-weight: bold;">
+    ----来自星光管理员（侵权致谢）
+</div>
+
+<div class="layui-form" style="margin-top: 30px;
+    text-align: right;">
+    <input lay-filter="yes_know" type="checkbox" title="我同意以上规则" lay-skin="primary">
+</div>
+
+<div style="margin: 10px; text-align: right;">
+    <button class="layui-btn layui-btn-normal layui-btn-sm jy" style="border-radius: 10px;" id="closeWin"
+            onclick="noKnow('请勾选同意按钮')">同意并关闭窗口
+    </button>
+</div>
+<form th:action="@{/}" id="URL"></form>
+</body>
+
+<script th:src="@{/layui/layui.js}"></script>
+<script th:src="@{/jquery-1.9.1.min.js}"></script>
+<script>
+    //Demo
+    layui.use('form', function () {
+        var form = layui.form;
+
+        form.on('checkbox(yes_know)', function (data) {
+            if (data.elem.checked) {
+                $("#closeWin").removeClass("jy");
+                $("#closeWin").attr("onclick", "yesKnow()")
+            } else {
+                $("#closeWin").addClass("jy");
+                $("#closeWin").attr("onclick", "noKnow('请勾选同意按钮')")
+            }
+        });
+    });
+
+    function noKnow(msg) {
+        layer.msg(msg);
+    }
+
+    function yesKnow() {
+        var $closeWin = $("#closeWin");
+        $closeWin.addClass("jy");
+        $closeWin.html("请求中...");
+        $closeWin.attr("onclick", "noKnow('请求中，请稍等')")
+
+        // 发送AJAX
+        $.post(
+            $("#URL").attr("action") + "consent",
+            function (data) {
+                if (data.status == 200) {
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                } else {
+                    layer.msg(data.msg)
+                    $closeWin.removeClass("jy");
+                    $closeWin.html("同意并关闭窗口");
+                    $closeWin.attr("onclick", "yesKnow()")
+                }
+            }, "json"
+        );
+    }
+</script>
+</html>

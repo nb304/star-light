@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" style="height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <title>充值星币</title>
+
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+
+    <style>
+        .layui-form-item {
+            width: 95% !important;
+        }
+
+        .jy {
+            cursor: no-drop !important;
+            background-color: #CCC !important;
+        }
+
+        .one_money div {
+            float: left;
+        }
+
+        .one_money {
+            margin: 10px;
+            height: 70px;
+            line-height: 50px;
+        }
+
+        .money_content {
+            font-weight: bold;
+            font-size: 25px;
+            margin: 0px 10px 0px 0px;
+        }
+
+        .song {
+            font-size: 13px;
+            color: #AFAFAF;
+        }
+
+        .song_content {
+            color: #FFD500;
+            font-size: 12px;
+        }
+
+        .money_btn {
+            cursor: pointer;
+            float: right;
+            width: 80px;
+            height: 30px;
+            color: #FFF;
+            margin-top: 10px;
+            background-color: #5661B3;
+            border-radius: 20px;
+            text-align: center;
+            line-height: 30px;
+            float: right !important;
+            font-size: 12px;
+        }
+
+        .button_class {
+            height: 13%;
+            margin: 10px 10px 0px 10px;
+            border-top: 1px solid #CCC;
+        }
+
+        .consent_class {
+            height: 40%;
+            color: #AFAFAF;
+            font-size: 12px;
+            line-height: 45px;
+        }
+
+        .button_title_class {
+            height: 40%;
+            color: #AFAFAF;
+            font-size: 12px;
+            line-height: 40px;
+        }
+
+        .help_class {
+            color: #5661B3;
+            float: right;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .pay_content {
+            text-align: center;
+            position: absolute;
+            color: #AFAFAF;
+            width: 100%;
+            margin-top: 100px;
+        }
+
+        .loading_class {
+            height: 100%;
+            position: absolute;
+            background-color: #FFF;
+            z-index: 999999999;
+            display: none;
+        }
+    </style>
+</head>
+<body style="height: 100%;">
+<div style="height: 100%;" class="loading_class">
+    <div class="pay_content">正在支付中</div>
+    <img style="width: 100%;" th:src="@{/loading.gif}">
+</div>
+<!-- 充值列表 -->
+<div style="max-height: 85%; min-height: 85%; overflow: auto;">
+    <div th:each="mType:${moneyType}" class="one_money">
+        <!-- 图片 -->
+        <div>
+            <img style="width: 30px;" th:src="@{/money.png}">
+        </div>
+        <!-- 星币 -->
+        <div class="money_content">
+            [[${mType.slMoneyName}]]
+        </div>
+        <!-- 赠送量 -->
+        <div class='song'>
+            赠送<span class="song_content">[[${mType.slGiveMoney}]]星币</span>
+        </div>
+        <!-- 按钮 -->
+        <div class="money_btn" th:onclick="'JavaScript:pay(\''+${mType.slMoneyId}+'\')'">
+            [[${mType.slRmb}]]RMB
+        </div>
+    </div>
+</div>
+
+<!-- 其他帮助 -->
+<div class="button_class">
+    <div class="consent_class">
+        <input type="radio" name="consent" value="1"/> <span>同意
+        <span style=" color: #5661B3; cursor: pointer;" onclick="openConsent()">星光充值服务规则</span> <span
+                class="help_class">充值帮助 ></span></span>
+    </div>
+    <div class="button_title_class">
+        温馨提示：未成年人不得充值，谢谢。
+    </div>
+    <input type="hidden" th:value="${PAY}" id="pay"/>
+</div>
+</body>
+<script th:src="@{/layui/layui.js}"></script>
+<script th:src="@{/jquery-1.9.1.min.js}"></script>
+<script th:src="@{/aes.js}"></script>
+<script>
+    layui.use('layer', function () {
+        var layer = layui.layer;
+
+    });
+    layui.use('form', function () {
+        var form = layui.form;
+
+    });
+
+    function pay(id) {
+        var val = $("input:radio[name='consent']:checked").val();
+        if (val == "1") {
+            $(".loading_class").show();
+            setTimeout(function () {
+                $(".pay_content").html('正在请求中，请耐心等待...');
+                setTimeout(function () {
+                    $(".pay_content").html('服务器压力过大，请耐心等待...');
+                }, 1500)
+            }, 1500)
+            location.href = $("#pay").val() + "/pay?moneyTypeId=" + id;
+        } else {
+            layer.msg("请勾选‘星光充值规则’");
+        }
+    }
+
+    function openConsent() {
+        var index = layer.open({
+            type: 2,
+            title: '星光充值规则',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['100%', '100%'],
+            scrollbar: false,
+            content: 'show/consent' //iframe的url
+        });
+
+        layer.full(index);
+    }
+
+    document.oncontextmenu = function () {
+        return false;
+    };
+
+    document.onkeydown = function (e) {
+        var currKey = 0,
+            evt = e || window.event;
+        currKey = evt.keyCode || evt.which || evt.charCode;
+        if (currKey == 123) {
+            window.event.cancelBubble = true;
+            window.event.returnValue = false;
+        }
+    }
+</script>
+</html>
