@@ -26,6 +26,11 @@ public class MoneyManageController {
     @Autowired
     private MoneyManageService defaultMoneyManageService;
 
+    @RequestMapping("/model")
+    public String model() {
+        return "model";
+    }
+
     /**
      * 我的星币首页
      *
