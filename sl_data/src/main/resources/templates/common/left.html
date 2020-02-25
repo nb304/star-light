@@ -32,7 +32,7 @@
                     我的作品
                 </div>
             </li>
-            <li class="ml-2 mb-4 flex lg:hidden">
+            <li class="ml-2 mb-4 flex">
                 <img th:src="@{/images/profile-default.svg}" alt="profile-icon" class="w-4 h-4 mr-2">
                 <div class="hover:cursor-pointer text-white lg:text-indigo-darkest no-underline font-medium"
                      id="mobile-profile-trigger">我的信息
@@ -121,6 +121,33 @@
 
     function gotoXgIndex() {
         location.href = $("#DATA").val();
+    }
+
+    // 退出账号
+    function exitUser() {
+
+        //页面层
+
+        layer.open({
+            type: 1,
+            skin: 'layui-layer-rim', //加上边框
+            area: ['420px', '240px'], //宽高
+            closeBtn: 0,
+            content: '5秒后自动刷新网页'
+        });
+        setTimeout(function () {
+            location.reload();
+        }, 5000)
+
+        $.ajax({
+            url: $("#SSO").val() + "/exit",
+            type: "GET",
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (data) {
+            }
+        });
     }
 
 </script>

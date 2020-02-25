@@ -311,32 +311,6 @@
 <script th:src="@{/layui/layui.js}"></script>
 <script th:src="@{/jquery-1.9.1.min.js}"></script>
 <script>
-    // 退出账号
-    function exitUser() {
-
-        //页面层
-
-        layer.open({
-            type: 1,
-            skin: 'layui-layer-rim', //加上边框
-            area: ['420px', '240px'], //宽高
-            closeBtn: 0,
-            content: '5秒后自动刷新网页'
-        });
-        setTimeout(function () {
-            location.reload();
-        }, 5000)
-
-        $.ajax({
-            url: $("#SSO").val() + "/exit",
-            type: "GET",
-            xhrFields: {
-                withCredentials: true
-            },
-            success: function (data) {
-            }
-        });
-    }
 
     // 切换类型
     function cutType(id) {
